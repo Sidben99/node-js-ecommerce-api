@@ -77,6 +77,14 @@ const orderRoute = require('./routes/orderRoute');
 
 app.use('/api/v1/order', orderRoute);
 
+const { webHookCheckout } = require('./controller/orderController');
+
+app.post(
+  '/webhook',
+  express.raw({ type: 'application/json' }),
+  webHookCheckout
+);
+
 const ApiError = require('./utils/apiError');
 
 // catching any not founded routes
