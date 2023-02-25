@@ -153,6 +153,34 @@ const webHookCheckout = asyncHandler((req, res, next) => {
   if (event.type === 'checkout.session.completed') {
     console.log('create order here .............');
   }
+  // Use its type to find out what happened
+  if (event.type == 'payment_intent.payment_failed') {
+    // Get the object affected
+    const paymentIntent = event.data.object;
+
+    // Use stored information to get an error object
+    const error = paymentIntent.error;
+
+    // Use its type to choose a response
+    switch (error.type) {
+      case 'StripeCardError':
+        console.log(`A payment error occurred: ${error.message}`);
+        break;
+      case 'StripeInvalidRequestError':
+        console.log('An invalid request occurred.');
+        if (error.param) {
+          console.log(
+            `The parameter ${error.param} is invalid or missing.`
+          );
+        }
+        break;
+      default:
+        console.log(
+          'Another problem occurred, maybe unrelated to Stripe.'
+        );
+        break;
+    }
+  }
 });
 
 module.exports = {
