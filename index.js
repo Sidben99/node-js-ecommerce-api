@@ -79,11 +79,7 @@ app.use('/api/v1/order', orderRoute);
 
 const { webHookCheckout } = require('./controller/orderController');
 
-app.post(
-  '/webhook',
-  express.raw({ type: 'application/json' }),
-  webHookCheckout
-);
+app.post('/', express.raw({ type: 'application/json' }), webHookCheckout);
 
 const ApiError = require('./utils/apiError');
 
