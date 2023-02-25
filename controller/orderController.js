@@ -136,9 +136,29 @@ const getCheckoutSession = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: 'message', session });
 });
 
+const webHookCheckout = asyncHandler((req, res, next) => {
+  const sig = req.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  if (event.type === 'checkout.session.completed') {
+    console.log('create order here .............');
+  }
+});
+
 module.exports = {
   createCashOrder,
   getOrders,
   changeStateTo,
   getCheckoutSession,
+  webHookCheckout,
 };
