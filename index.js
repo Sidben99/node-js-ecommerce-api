@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const mongodbConnection = require('./config/dbConfig');
 
 require('dotenv').config();
@@ -25,6 +26,16 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 // enabling other domains to start using the api
 app.use(cors());
 app.options('*', cors());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply the rate limiting middleware to all requests
+app.use(limiter);
 
 // compress the responses
 app.use(compression());
